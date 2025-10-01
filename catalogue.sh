@@ -19,7 +19,7 @@ VALIDATE(){
     fi        
 }
 
-if [ $USERID -ne 0 ];
+if [ $ID -ne 0 ];
 then
     echo -e "$R ERROR: please run with root user $N"
     exit 1
@@ -37,7 +37,14 @@ dnf install nodejs -y &>> $LOGFILE
 VALIDATE $? "install nodejs"
 
 useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>> $LOGFILE
-VALIDATE $? "created system user"
+if [ $? -ne 0 ]
+then
+    useradd roboshop
+    VALIDATE $? "created system user"
+else
+    echo -e "roboshop user already exist $Y SKIPPING $N"
+fi
+
 
 mkdir -p /app &>> $LOGFILE
 VALIDATE $? "created app directory"
