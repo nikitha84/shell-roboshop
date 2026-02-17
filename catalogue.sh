@@ -92,8 +92,8 @@ else
     echo -e "Catalogue products already loaded ... $Y SKIPPING $N"
 fi
 
-systemct restart catalogie &>>$LOG_FILE
-VALIDATE $? "restart catalogie"
+systemct restart catalogue &>>$LOG_FILE
+VALIDATE $? "restart catalogue"
 
 #run
 #netstat
