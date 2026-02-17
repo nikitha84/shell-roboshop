@@ -1,8 +1,8 @@
 
 #!/bin/bash
 
-AMI_ID="ami-09c813fb71547fc4f"
-SG_ID="sg-07c8acf3fa6b923fa" # replace with your SG ID
+AMI_ID="ami-0a965fe1e7e52f3a4"
+SG_ID="sg-sg-0e3e30c31a49b6816" # replace with your SG ID
 ZONE_ID="Z0471800F5M99HXBVZ09" # replace with your ID
 DOMAIN_NAME="nikitha.fun"
 
