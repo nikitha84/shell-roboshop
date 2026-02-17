@@ -1,8 +1,8 @@
 
 #!/bin/bash
 
-AMI_ID="ami-0a965fe1e7e52f3a4"
-SG_ID="sg-sg-0e3e30c31a49b6816" # replace with your SG ID
+AMI_ID="ami-0220d79f3f480ecf5"
+SG_ID="sg-0e3e30c31a49b6816" # replace with your SG ID
 ZONE_ID="Z0471800F5M99HXBVZ09" # replace with your ID
 DOMAIN_NAME="nikitha.fun"
 
@@ -48,3 +48,13 @@ done
 # user 
 # redis
 # mysql 
+
+
+# aws ec2 run-instances \
+#     --image-id <ami-id> \
+#     --instance-type <instance-type> \
+#     --subnet-id <subnet-id> \ default
+#     --security-group-ids <security-group-id> \
+#     --key-name <ec2-key-pair-name> \ no need
+#     --count 1 \ no need
+#     --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=<MyInstanceName>}]'
