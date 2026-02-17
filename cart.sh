@@ -45,11 +45,10 @@ VALIDATE $? "install nodejs"
 id roboshop &>>$LOG_FILE
 if [ $? -ne 0 ]; then
     cartadd --system --home /app --shell /sbin/nologin --comment "roboshop system cart" roboshop &>>$LOG_FILE
-    VALIDATE $? "Creating system cart"
+    VALIDATE $? "Creating system cart user"
 else
-    echo -e "User already exist ... $Y SKIPPING $N"
+    echo -e "cart already exist ... $Y SKIPPING $N"
 fi
-
 
 mkdir -p /app &>>$LOG_FILE
 VALIDATE $? "created app directory"
