@@ -72,8 +72,8 @@ VALIDATE $? "Coping user service file"
 systemctl daemon-reload &>>$LOG_FILE
 VALIDATE $? "deamon reloaded"
 
-systemct restart catalogie &>>$LOG_FILE
-VALIDATE $? "restart catalogie"
+systemct restart user &>>$LOG_FILE
+VALIDATE $? "restart user"
 
 #run
 #netstat
