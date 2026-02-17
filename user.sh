@@ -14,7 +14,7 @@ N="\e[0m"
 LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 MONGODB_HOST=mongodb.nikitha.fun
-SCRIPT_DIR=$PWD #/home/shell-roboshop/catalogue.sh
+SCRIPT_DIR=$PWD #/home/shell-roboshop/user.sh
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-script/16-logs.log
 
 mkdir -p $LOGS_FOLDER
@@ -54,43 +54,23 @@ fi
 mkdir -p /app &>>$LOG_FILE
 VALIDATE $? "created app directory"
 
-curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip  &>>$LOG_FILE
-VALIDATE $? "Downloade catalogue file"
+curl -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user-v3.zip  &>>$LOG_FILE
+VALIDATE $? "Downloade user file"
 
 cd /app  &>>$LOG_FILE
 VALIDATE $? "changing to app directory"
 
-unzip -o /tmp/catalogue.zip &>>$LOG_FILE
-VALIDATE $? "Unziped catalogue file"
+unzip -o /tmp/user.zip &>>$LOG_FILE
+VALIDATE $? "Unziped user file"
 
 npm install  &>>$LOG_FILE
 VALIDATE $? "Installing dependencies"
 
-cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service &>>$LOG_FILE
-VALIDATE $? "Coping catalogue service file"
+cp $SCRIPT_DIR/user.service /etc/systemd/system/user.service &>>$LOG_FILE
+VALIDATE $? "Coping user service file"
 
 systemctl daemon-reload &>>$LOG_FILE
 VALIDATE $? "deamon reloaded"
-
-systemctl enable catalogue &>>$LOG_FILE
-VALIDATE $? "ebnabled catalogue"
-
-systemctl start catalogue &>>$LOG_FILE
-VALIDATE $? "stttaared catalogue"
-
-cp  $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOG_FILE
-VALIDATE $? "copied mongodb repo"
-
-dnf install mongodb-mongosh -y &>>$LOG_FILE
-VALIDATE $? "installed mongodb shell"
-
-INDEX=$(mongosh mongodb.daws86s.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
-if [ $INDEX -le 0 ]; then
-    mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOG_FILE
-    VALIDATE $? "Load catalogue products"
-else
-    echo -e "Catalogue products already loaded ... $Y SKIPPING $N"
-fi
 
 systemct restart catalogie &>>$LOG_FILE
 VALIDATE $? "restart catalogie"

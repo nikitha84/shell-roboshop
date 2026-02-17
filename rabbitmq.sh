@@ -9,6 +9,7 @@ N="\e[0m"
 LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 MONGODB_HOST=mongodb.nikitha.fun
+SCRIPT_DIR=$PWD #/home/shell-roboshop/catalogue.sh
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-script/16-logs.log
 
 mkdir -p $LOGS_FOLDER
@@ -27,25 +28,20 @@ VALIDATE(){ # functions receive inputs through args just like shell script args
         echo -e "$2 ... $G SUCCESS $N" | tee -a $LOG_FILE
     fi
 }
+cp $SCRIPT_DIR/rabbitmq /etc/yum.repos.d/rabbitmq.repo &>>$LOG_FILE
+VALIDATE $? "cpoied rabbitmq.repo"
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOG_FILE
-VALIDATE $? "copied mongo.repo"
+dnf install rabbitmq-server -y &>>$LOG_FILE
+VALIDATE $? "installing mysql"
 
-dnf install mongodb-org -y  &>>$LOG_FILE
-VALIDATE $? "installed mongodb"
+systemctl enable rabbitmq-server &>>$LOG_FILE
+VALIDATE $? "enable rabbitmq"
 
-systemctl enable mongod  &>>$LOG_FILE
-VALIDATE $? "enabled mongodb"
+systemctl start rabbitmq-server &>>$LOG_FILE
+VALIDATE $? "start rabbitmq"
 
-systemctl start mongod  &>>$LOG_FILE
-VALIDATE $? "started mongodb"
+rabbitmqctl add_user roboshop roboshop123 &>>$LOG_FILE
+VALIDATE $? "Adding user"
 
-sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf &>>$LOG_FILE
-VALIDATE $? "remote access to mongodb"
-
-systemctl restart mongod &>>$LOG_FILE
-VALIDATE $? "restarted to mongodb"
-
-#push -pull
-#sudo sh mongodb.sh
-#netstat -lntp
+rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"  &>>$LOG_FILE
+VALIDATE $? "setting up permission"

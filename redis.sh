@@ -9,6 +9,7 @@ N="\e[0m"
 LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 MONGODB_HOST=mongodb.nikitha.fun
+SCRIPT_DIR=$PWD #/home/shell-roboshop/catalogue.sh
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-script/16-logs.log
 
 mkdir -p $LOGS_FOLDER
@@ -27,25 +28,20 @@ VALIDATE(){ # functions receive inputs through args just like shell script args
         echo -e "$2 ... $G SUCCESS $N" | tee -a $LOG_FILE
     fi
 }
+dnf module disable redis -y &>>$LOG_FILE
+VALIDATE $? "disable redis"
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOG_FILE
-VALIDATE $? "copied mongo.repo"
+dnf module enable redis:7 -y &>>$LOG_FILE
+VALIDATE $? "enable redis"
 
-dnf install mongodb-org -y  &>>$LOG_FILE
-VALIDATE $? "installed mongodb"
+dnf install redis -y &>>$LOG_FILE
+VALIDATE $? "installing redis"
 
-systemctl enable mongod  &>>$LOG_FILE
-VALIDATE $? "enabled mongodb"
+sed -i -e 's/127.0.0.1/0.0.0.0/g' -e '/protected-mode/ c protected-mode no' /etc/redis/redis.conf &>>$LOG_FILE
+VALIDATE $? "allowing remote access & disable protected mode"
 
-systemctl start mongod  &>>$LOG_FILE
-VALIDATE $? "started mongodb"
+systemctl enable redis &>>$LOG_FILE
+VALIDATE $? "enable redis"
 
-sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf &>>$LOG_FILE
-VALIDATE $? "remote access to mongodb"
-
-systemctl restart mongod &>>$LOG_FILE
-VALIDATE $? "restarted to mongodb"
-
-#push -pull
-#sudo sh mongodb.sh
-#netstat -lntp
+systemctl start redis &>>$LOG_FILE
+VALIDATE $? "start redis"

@@ -9,6 +9,7 @@ N="\e[0m"
 LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 MONGODB_HOST=mongodb.nikitha.fun
+SCRIPT_DIR=$PWD #/home/shell-roboshop/catalogue.sh
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-script/16-logs.log
 
 mkdir -p $LOGS_FOLDER
@@ -27,25 +28,14 @@ VALIDATE(){ # functions receive inputs through args just like shell script args
         echo -e "$2 ... $G SUCCESS $N" | tee -a $LOG_FILE
     fi
 }
-
-cp mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOG_FILE
-VALIDATE $? "copied mongo.repo"
-
-dnf install mongodb-org -y  &>>$LOG_FILE
-VALIDATE $? "installed mongodb"
-
-systemctl enable mongod  &>>$LOG_FILE
-VALIDATE $? "enabled mongodb"
-
-systemctl start mongod  &>>$LOG_FILE
-VALIDATE $? "started mongodb"
-
-sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf &>>$LOG_FILE
-VALIDATE $? "remote access to mongodb"
-
-systemctl restart mongod &>>$LOG_FILE
-VALIDATE $? "restarted to mongodb"
-
-#push -pull
-#sudo sh mongodb.sh
-#netstat -lntp
+dnf module disable nginx -y
+dnf module enable nginx:1.24 -y
+dnf install nginx -y
+systemctl enable nginx 
+systemctl start nginx 
+rm -rf /usr/share/nginx/html/* 
+curl -o /tmp/frontend.zip https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip
+cd /usr/share/nginx/html 
+unzip /tmp/frontend.zip
+cp $SCRIPT_DIR/nginx.conf /etc/nginx/nginx.conf
+systemctl restart nginx 

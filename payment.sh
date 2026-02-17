@@ -9,6 +9,7 @@ N="\e[0m"
 LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 MONGODB_HOST=mongodb.nikitha.fun
+SCRIPT_DIR=$PWD #/home/shell-roboshop/catalogue.sh
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-script/16-logs.log
 
 mkdir -p $LOGS_FOLDER
@@ -27,25 +28,28 @@ VALIDATE(){ # functions receive inputs through args just like shell script args
         echo -e "$2 ... $G SUCCESS $N" | tee -a $LOG_FILE
     fi
 }
+dnf install python3 gcc python3-devel -y
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOG_FILE
-VALIDATE $? "copied mongo.repo"
+id roboshop &>>$LOG_FILE
+if [ $? -ne 0 ]; then
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
+    VALIDATE $? "Creating system user"
+else
+    echo -e "User already exist ... $Y SKIPPING $N"
+fi
 
-dnf install mongodb-org -y  &>>$LOG_FILE
-VALIDATE $? "installed mongodb"
+mkdir -p /app &>>$LOG_FILE
+VALIDATE $? "created app directory"
 
-systemctl enable mongod  &>>$LOG_FILE
-VALIDATE $? "enabled mongodb"
+curl -L -o /tmp/payment.zip https://roboshop-artifacts.s3.amazonaws.com/payment-v3.zip 
+cd /app 
+unzip /tmp/payment.zip
 
-systemctl start mongod  &>>$LOG_FILE
-VALIDATE $? "started mongodb"
+cd /app 
+pip3 install -r requirements.txt
 
-sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf &>>$LOG_FILE
-VALIDATE $? "remote access to mongodb"
+cp $SCRIPT_DIR/payment.service /etc/systemd/system/payment.service
 
-systemctl restart mongod &>>$LOG_FILE
-VALIDATE $? "restarted to mongodb"
-
-#push -pull
-#sudo sh mongodb.sh
-#netstat -lntp
+systemctl daemon-reload
+systemctl enable payment 
+systemctl start payment
