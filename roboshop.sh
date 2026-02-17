@@ -3,7 +3,7 @@
 
 AMI_ID="ami-09c813fb71547fc4f"
 SG_ID="sg-07c8acf3fa6b923fa" # replace with your SG ID
-ZONE_ID="Z0948150OFPSYTNVYZOY" # replace with your ID
+ZONE_ID="Z0471800F5M99HXBVZ09" # replace with your ID
 DOMAIN_NAME="nikitha.fun"
 
 for instance in $@ # mongodb redis mysql
