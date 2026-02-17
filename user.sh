@@ -72,7 +72,7 @@ VALIDATE $? "Coping user service file"
 systemctl daemon-reload &>>$LOG_FILE
 VALIDATE $? "deamon reloaded"
 
-systemct restart user &>>$LOG_FILE
+systemctl restart user &>>$LOG_FILE
 VALIDATE $? "restart user"
 
 #run

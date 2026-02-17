@@ -72,8 +72,8 @@ VALIDATE $? "Coping cart service file"
 systemctl daemon-reload &>>$LOG_FILE
 VALIDATE $? "deamon reloaded"
 
-systemct restart catalogie &>>$LOG_FILE
-VALIDATE $? "restart catalogie"
+systemctl restart cart &>>$LOG_FILE
+VALIDATE $? "restart cart"
 
 #run
 #netstat
